@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>危险命令检测工具</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <div class="container">
+        <h1>危险命令检测工具</h1>
+
+        <!-- 系统切换标签 -->
+        <div class="tabs">
+            <button class="tab-btn active" data-tab="windows">Windows 命令检测</button>
+            <button class="tab-btn" data-tab="linux">Linux 命令检测</button>
+        </div>
+
+        <!-- Windows 板块 -->
+        <div class="tab-content active" id="windows">
+            <div class="input-section">
+                <label for="windows-command">请输入Windows命令：</label>
+                <textarea id="windows-command" placeholder="例如：rmdir -q -s C:\ 或 echo YWJj | base64 -d"></textarea>
+                <button id="windows-check">检测风险</button>
+            </div>
+            <div class="result-section" id="windows-result">
+                <h3>检测结果：</h3>
+                <div class="result-content"></div>
+            </div>
+        </div>
+
+        <!-- Linux 板块 -->
+        <div class="tab-content" id="linux">
+            <div class="input-section">
+                <label for="linux-command">请输入Linux命令：</label>
+                <textarea id="linux-command" placeholder="例如：rm -rf / 或 echo YWJj | base64 -d"></textarea>
+                <button id="linux-check">检测风险</button>
+            </div>
+            <div class="result-section" id="linux-result">
+                <h3>检测结果：</h3>
+                <div class="result-content"></div>
+            </div>
+        </div>
+    </div>
+    <script src="script.js"></script>
+</body>
+
+</html>

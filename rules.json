@@ -1,0 +1,132 @@
+{
+    "common": {
+        "base64": {
+            "regex": "(?:base64|echo\\\\s+)([A-Za-z0-9+/=_\\-]+)(?:\\\\s*\\\\|\\\\s*base64\\\\s*-d|)|^[A-Za-z0-9+/=_\\-]{8,}$",
+            "level": "risk",
+            "message": "检测到Base64编码命令（存在风险）"
+        },
+        "remote_url": {
+            "regex": "(http:\\/\\/|https:\\/\\/|ftp:\\/\\/|\\/\\/|curl|wget|Invoke-WebRequest|iwr)[^\\s]+",
+            "level": "risk",
+            "message": "风险：检测到陌生远程网址/远程下载命令"
+        },
+        "function_keyword": {
+            "regex": "function|eval|Invoke-Expression|iex|exec|shell_exec",
+            "level": "risk",
+            "message": "风险：检测到危险执行关键字（function/eval/iex等），需关注执行结果"
+        },
+        "encoding_convert": {
+            "regex": "iconv|chcp|encoding|decode|encode",
+            "level": "risk",
+            "message": "风险：检测到编码转换命令，可能用于隐藏恶意行为"
+        }
+    },
+    "windows": {
+        "extreme_danger": [
+            {
+                "regex": "(rd|rmdir|Remove-Item)\\s+.*(\\-q|\\-s|\\/s|\\/q|\\-Recurse|\\-Force).*C:\\\\",
+                "message": "极其危险：检测到强制删除C盘根目录的命令（rd/rmdir/Remove-Item -q/-s/-Recurse C:\\）"
+            },
+            {
+                "regex": "format\\s+[A-Z]:\\s*\\/FS|diskpart|clean|delete partition",
+                "message": "极其危险：检测到磁盘格式化/分区删除命令，会导致数据完全丢失"
+            },
+            {
+                "regex": "(del|erase)\\s+.*(\\/f|\\/s|\\/q).*System32|(del|erase)\\s+.*Windows\\\\System32",
+                "message": "极其危险：检测到强制删除系统核心文件（System32）的命令"
+            }
+        ],
+        "danger": [
+            {
+                "regex": "rd|rmdir|Remove-Item",
+                "message": "危险：检测到删除目录/文件命令（rd/rmdir/Remove-Item）"
+            },
+            {
+                "regex": "C:\\\\|System32|Windows|Win32|Program Files|\\%SystemRoot\\%|\\%WINDIR\\%",
+                "message": "危险：检测到涉及Windows系统关键路径（C:\\/System32/Windows等）"
+            },
+            {
+                "regex": "del|erase|rm|Remove-Item\\s+.*(\\-Force|\\/f)",
+                "message": "危险：检测到强制删除文件命令（del /f/Remove-Item -Force）"
+            },
+            {
+                "regex": "taskkill\\s+\\/f\\s+\\/im|sc\\s+delete|net\\s+stop\\s+.*service",
+                "message": "危险：检测到强制结束进程/删除系统服务命令"
+            },
+            {
+                "regex": "reg\\s+delete|reg\\s+add\\s+.*HKLM|reg\\s+add\\s+.*HKCU",
+                "message": "危险：检测到修改/删除注册表关键项命令"
+            }
+        ],
+        "risk": [
+            {
+                "regex": "powershell\\s+\\-EncodedCommand|\\-enc",
+                "message": "风险：检测到PowerShell编码执行命令，可能隐藏恶意行为"
+            },
+            {
+                "regex": "cmd\\s+\\/c|cmd\\s+\\/k|start\\s+cmd",
+                "message": "风险：检测到嵌套执行CMD命令，可能用于绕过检测"
+            },
+            {
+                "regex": "copy\\s+.*\\\\system32|move\\s+.*\\\\system32",
+                "message": "风险：检测到向系统目录复制/移动文件，可能篡改系统文件"
+            }
+        ]
+    },
+    "linux": {
+        "extreme_danger": [
+            {
+                "regex": "rm\\s+.*(\\-rf|\\-fr|\\-r\\-f).*\\/\\s*",
+                "message": "极其危险：检测到强制删除根目录的命令（rm -rf /）"
+            },
+            {
+                "regex": "mkfs|fdisk\\s+\\-d|parted\\s+.*rm|dd\\s+if=\\/dev\\/zero|shred\\s+\\-zvu",
+                "message": "极其危险：检测到磁盘格式化/数据覆写命令，会导致数据完全丢失"
+            },
+            {
+                "regex": "rm\\s+\\-rf\\s+\\/system\\/|rm\\s+\\-rf\\s+\\/boot\\/|rm\\s+\\-rf\\s+\\/etc\\/init.d\\/",
+                "message": "极其危险：检测到删除Linux系统核心目录（/system//boot//etc/init.d/）的命令"
+            },
+            {
+                "regex": "chmod\\s+777\\s+\\/|chown\\s+.*\\/|chgrp\\s+.*\\/",
+                "message": "极其危险：检测到修改根目录权限命令，会导致系统权限失控"
+            }
+        ],
+        "danger": [
+            {
+                "regex": "rm\\s+(\\-r|\\-f|\\-rf|\\-fr)",
+                "message": "危险：检测到递归/强制删除命令（rm -r/-f/-rf）"
+            },
+            {
+                "regex": "\\/system\\/|\\/boot\\/|\\/root\\/|\\/etc\\/|\\/bin\\/|\\/sbin\\/|\\/usr\\/bin\\/",
+                "message": "危险：检测到涉及Linux系统关键路径（/system//boot//root/etc等）"
+            },
+            {
+                "regex": "kill\\s+\\-9\\s+1|killall\\s+systemd|pkill\\s+init",
+                "message": "危险：检测到强制结束系统核心进程命令"
+            },
+            {
+                "regex": "chmod\\s+777|chown\\s+root:root\\s+.*\\/tmp\\/",
+                "message": "危险：检测到修改高危权限命令，可能导致权限泄露"
+            },
+            {
+                "regex": "mount\\s+\\-o\\s+rw|umount\\s+\\/|losetup",
+                "message": "危险：检测到磁盘挂载/卸载命令，可能篡改系统存储"
+            }
+        ],
+        "risk": [
+            {
+                "regex": "bash\\s+\\-c|sh\\s+\\-c|zsh\\s+\\-c",
+                "message": "风险：检测到嵌套Shell执行命令，可能用于隐藏恶意行为"
+            },
+            {
+                "regex": "base64\\s+\\-d|openssl\\s+enc|gzip\\s+\\-d|gunzip",
+                "message": "风险：检测到解码/解压命令，可能用于还原隐藏的恶意脚本"
+            },
+            {
+                "regex": "nohup|setsid|screen|tmux",
+                "message": "风险：检测到后台执行命令，可能用于持久化恶意进程"
+            }
+        ]
+    }
+}
